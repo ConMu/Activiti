@@ -1372,6 +1372,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         classLoader = ReflectUtil.getClassLoader();
       }
 
+      // Java 通过SPI机制，加载所有实现了ProcessEngineConfigurator接口的类，类似jdbc接口实现也是这样子的
       ServiceLoader<ProcessEngineConfigurator> configuratorServiceLoader = ServiceLoader.load(ProcessEngineConfigurator.class, classLoader);
       int nrOfServiceLoadedConfigurators = 0;
       for (ProcessEngineConfigurator configurator : configuratorServiceLoader) {
@@ -1413,6 +1414,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  /**  执行调用每个 ProcessEngineConfigurator 的beforeInit()*/
   public void configuratorsBeforeInit() {
     for (ProcessEngineConfigurator configurator : allConfigurators) {
       log.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
@@ -1662,6 +1664,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  /** 主要用于流程部署时的缩略图的生成*/
   public void initProcessDiagramGenerator() {
     if (processDiagramGenerator == null) {
       processDiagramGenerator = new DefaultProcessDiagramGenerator();
@@ -1904,6 +1907,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
   }
 
+  /**
+   * 初始化表达式管理器，用于解析流程中配置的表达式
+   **/
   public void initExpressionManager() {
     if (expressionManager == null) {
       expressionManager = new ExpressionManager(beans);
